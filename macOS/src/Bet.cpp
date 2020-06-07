@@ -18,8 +18,8 @@ void Bet::update() {
     }
     
     if (m_betUp.mouseOver() || m_betDown.mouseOver() || m_startButton.mouseOver() || m_exitButton.mouseOver()) {
-		Cursor::RequestStyle(CursorStyle::Hand);
-	}
+        Cursor::RequestStyle(CursorStyle::Hand);
+    }
 
     // 賭け金の設定
     if (m_betUp.leftClicked()) {

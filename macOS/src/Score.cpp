@@ -9,11 +9,11 @@ Score::Score(const InitData& init)
     ScoreData{0, Date(2020,1,1)},
     ScoreData{0, Date(2020,1,1)}
 }) {
-    if (FileSystem::Exists(Resource(U"Save/Score.dat"))) {
-        Deserializer<BinaryReader>{Resource(U"Save/Score.dat")}(m_highScores);
+    if (FileSystem::Exists(U"saves/score.dat")) {
+        Deserializer<BinaryReader>{U"saves/score.dat"}(m_highScores);
     }
     else {
-        Serializer<BinaryWriter>{Resource(U"Save/Score.dat")}(m_highScores);
+        Serializer<BinaryWriter>{U"saves/score.dat"}(m_highScores);
     }
 }
 

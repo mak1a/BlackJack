@@ -19,12 +19,12 @@ Game::Game(const InitData& init)
 , m_winCount(getData().winCount)
 , m_loseCount(getData().loseCount)
 , m_drawCount(getData().drawCount) {
-	// カードをシャッフルする
-	getData().cards.shuffle();
+    // カードをシャッフルする
+    getData().cards.shuffle();
 }
 
 void Game::DistributeInit() {
-	// 山札が4枚未満だった場合
+    // 山札が4枚未満だった場合
     if (getData().cards.size() < 4) {
         // 墓地のカードをシャッフルする
         getData().cemeteryCards.shuffle();
@@ -36,47 +36,47 @@ void Game::DistributeInit() {
         }
     }
 
-	// 配るのが敵側の時かつ、1枚既に持ってる場合
+    // 配るのが敵側の時かつ、1枚既に持ってる場合
     if (m_enemyCards.size() == 1 && m_distributeEnemyTimer.isRunning() && m_distributeEnemyTimer >= 0.5s) {
         // 配るトランプを裏面にする
         getData().cards[0].flip();
     }
 
-	// 配るのが敵側の時
-	if (m_distributeEnemyTimer.isRunning() && m_distributeEnemyTimer >= 0.5s) {
-		// 敵にカードを配り、処理を終了する
+    // 配るのが敵側の時
+    if (m_distributeEnemyTimer.isRunning() && m_distributeEnemyTimer >= 0.5s) {
+        // 敵にカードを配り、処理を終了する
         m_enemyCards.emplace_back(getData().cards[0]);
         getData().cards.pop_front();
-		m_distributeEnemyTimer.reset();
+        m_distributeEnemyTimer.reset();
         m_distributeTimer.restart();
 
         CalucurateEnemyScore();
         return;
-	}
+    }
 
-	// 配るのがプレイヤー側の場合
-	if (m_distributeTimer.isRunning() && m_distributeTimer >= 0.5s) {
-		// プレイヤーにカードを配る
-		m_playerCards.emplace_back(getData().cards[0]);
-		getData().cards.pop_front();
+    // 配るのがプレイヤー側の場合
+    if (m_distributeTimer.isRunning() && m_distributeTimer >= 0.5s) {
+        // プレイヤーにカードを配る
+        m_playerCards.emplace_back(getData().cards[0]);
+        getData().cards.pop_front();
 
-		// プレイヤーの持っているカードが1枚の場合
-		if (m_playerCards.size() == 1) {
-			// 処理を終了する
-			m_distributeEnemyTimer.restart();
-        	m_distributeTimer.reset();
+        // プレイヤーの持っているカードが1枚の場合
+        if (m_playerCards.size() == 1) {
+            // 処理を終了する
+            m_distributeEnemyTimer.restart();
+            m_distributeTimer.reset();
 
             CalucuratePlayerScore();
-			return;
-		}
+            return;
+        }
 
-		// 配る処理を終了する
-		m_distributeEnemyTimer.reset();
+        // 配る処理を終了する
+        m_distributeEnemyTimer.reset();
         m_distributeTimer.reset();
-		m_turn = Turn::Player;
+        m_turn = Turn::Player;
 
         CalucuratePlayerScore();
-	}
+    }
 }
 
 void Game::DistributeChild() {
@@ -240,17 +240,17 @@ void Game::CollectCard() {
 }
 
 void Game::update() {
-	switch (m_turn) {
-	case Turn::Distribute:
-		DistributeInit();
-		return;
-	case Turn::Player:
+    switch (m_turn) {
+    case Turn::Distribute:
+        DistributeInit();
+        return;
+    case Turn::Player:
         if (m_hitButton.mouseOver()) {
             Cursor::RequestStyle(CursorStyle::Hand);
             m_select = SelectButton::Hit;
         }
         else if (m_standButton.mouseOver()) {
-		    Cursor::RequestStyle(CursorStyle::Hand);
+            Cursor::RequestStyle(CursorStyle::Hand);
             m_select = SelectButton::Stand;
         }
         else {
@@ -278,24 +278,24 @@ void Game::update() {
             m_enemyCards[1].flip();
             CalucurateEnemyScore();
         }
-		return;
-	case Turn::Enemy:
+        return;
+    case Turn::Enemy:
         if (m_distributeEnemyTimer >= 0.5s) {
             m_distributeEnemyTimer.restart();
             DistributeParent();
         }
-		return;
+        return;
     case Turn::Result:
         if (MouseL.down()) {
             CollectCard();
             changeScene(State::Bet, 0s);
         }
         return;
-	}
+    }
 }
 
 void Game::draw() const {
-	FontAsset(U"ScoreListDate")(U"残りの山札の数：", getData().cards.size(), U"枚").drawAt(1050, 300);
+    FontAsset(U"ScoreListDate")(U"残りの山札の数：", getData().cards.size(), U"枚").drawAt(1050, 300);
     FontAsset(U"ScoreListDate")(U"賭け金：", m_betMoney, U"ペソ").drawAt(1050, 350);
     FontAsset(U"ScoreListDate")(U"残り残金：", m_haveMoney, U"ペソ").drawAt(1050, 400);
     

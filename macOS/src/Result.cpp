@@ -13,11 +13,11 @@ Result::Result(const InitData& init)
 , m_haveMoney(getData().haveMoney)
 , m_winCount(getData().winCount)
 , m_loseCount(getData().loseCount) {
-    if (FileSystem::Exists(Resource(U"Save/Score.dat"))) {
-        Deserializer<BinaryReader>{Resource(U"Save/Score.dat")}(m_highScores);
+    if (FileSystem::Exists(Resource(U"saves/score.dat"))) {
+        Deserializer<BinaryReader>{U"saves/score.dat"}(m_highScores);
     }
     else {
-        Serializer<BinaryWriter>{Resource(U"Save/Score.dat")}(m_highScores);
+        Serializer<BinaryWriter>{U"saves/score.dat"}(m_highScores);
     }
 
     if (m_highScores.back().score <= (m_haveMoney + m_betMoney))
@@ -28,7 +28,7 @@ Result::Result(const InitData& init)
             return a.score > b.score ? true : a.score == b.score ? a.date > b.date : false;
         });
         
-        Serializer<BinaryWriter>{Resource(U"Save/Score.dat")}(m_highScores);
+        Serializer<BinaryWriter>{U"saves/score.dat"}(m_highScores);
     }
 }
 
