@@ -82,35 +82,51 @@ private:
     /// </summary>
     const uint32 m_drawCount;
 
+    enum class Winner {
+        Player,
+        Enemy,
+        Draw
+    } m_winner;
+
     /// <summary>
-    /// Playerが勝利したか
+    /// 勝者を決定する
     /// </summary>
-    /// <returns>Playerが勝利したか</returns>
-    [[nodiscard]] bool IsPlayerWin() const noexcept {
+    void DeterminWinner() noexcept {
+        /// <summary>
+        /// プレイヤーのみがブラックジャックならプレイヤーの勝利
+        /// </summary>
         if (m_playerCards.size() == 2) {
             if (((m_playerCards[0].isAce() && m_playerCards[1].rank >= 10) || (m_playerCards[1].isAce() && m_playerCards[0].rank >= 10))
                 && !((m_enemyCards[0].isAce() && m_enemyCards[1].rank >= 10) || (m_enemyCards[1].isAce() && m_enemyCards[0].rank >= 10))) {
-                return true;
+                m_winner = Winner::Player;
+                return;
             }
         }
 
+        /// <summary>
+        /// 敵のみがブラックジャックなら敵の勝利
+        /// </summary>
         if (m_enemyCards.size() == 2) {
             if (((m_enemyCards[0].isAce() && m_enemyCards[1].rank >= 10) || (m_enemyCards[1].isAce() && m_enemyCards[0].rank >= 10))
                 && !((m_playerCards[0].isAce() && m_playerCards[1].rank >= 10) || (m_playerCards[1].isAce() && m_playerCards[0].rank >= 10))) {
-                return false;
+                m_winner = Winner::Enemy;
+                return;
             }
         }
 
-        return (m_playerScore <= 21 && (m_playerScore > m_enemyScore || m_enemyScore > 21));
-    }
-    /// <summary>
-    /// 引き分けか
-    /// </summary>
-    /// <returns>引き分けか</returns>
-    [[nodiscard]] bool IsDrawGame() const noexcept {
-        return m_playerScore <= 21 && m_playerScore == m_enemyScore;
-    }
+        if (m_playerScore <= 21 && m_playerScore == m_enemyScore) {
+            m_winner = Winner::Draw;
+            return;
+        }
 
+        if (m_playerScore <= 21 && (m_playerScore > m_enemyScore || m_enemyScore > 21)) {
+            m_winner = Winner::Player;
+            return;
+        }
+
+        m_winner = Winner::Enemy;
+    }
+    
     /// <summary>
     /// プレイヤーにカードを配る処理
     /// </summary>
