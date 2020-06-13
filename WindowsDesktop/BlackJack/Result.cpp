@@ -13,7 +13,7 @@ Result::Result(const InitData& init)
     , m_haveMoney(getData().haveMoney)
     , m_winCount(getData().winCount)
     , m_loseCount(getData().loseCount) {
-    if (FileSystem::Exists(Resource(U"saves/score.dat"))) {
+    if (FileSystem::Exists(U"saves/score.dat")) {
         Deserializer<BinaryReader>{U"saves/score.dat"}(m_highScores);
     }
     else {
