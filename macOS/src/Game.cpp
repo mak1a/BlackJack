@@ -18,7 +18,8 @@ Game::Game(const InitData& init)
 , m_haveMoney(getData().haveMoney)
 , m_winCount(getData().winCount)
 , m_loseCount(getData().loseCount)
-, m_drawCount(getData().drawCount) {
+, m_drawCount(getData().drawCount)
+, m_winner(Winner::Draw) {
     // カードをシャッフルする
     getData().cards.shuffle();
 }
@@ -156,6 +157,10 @@ void Game::CalucuratePlayerScore() {
 
     // 21点を超えた場合、リザルトへ
     if (m_playerScore > 21) {
+        /// <summary>
+        /// この時点で勝者を決定する
+        /// </summary>
+        DeterminWinner();
         m_turn = Turn::Result;
     }
 }
@@ -192,7 +197,11 @@ void Game::CalucurateEnemyScore() {
     }
 
     // 17点を超えた場合、リザルトへ
-    if (m_enemyScore > 17) {
+    if (m_enemyScore >= 17) {
+        /// <summary>
+        /// この時点で勝者を決定する
+        /// </summary>
+        DeterminWinner();
         m_distributeEnemyTimer.reset();
         m_turn = Turn::Result;
     }
@@ -200,7 +209,12 @@ void Game::CalucurateEnemyScore() {
 
 void Game::CollectCard() {
     // 賭け金の処理
-    if (!IsPlayerWin() && !IsDrawGame()) {
+    switch (m_winner) {
+    case Winner::Player:
+        ++getData().winCount;
+        getData().haveMoney += getData().betMoney;
+        break;
+    case Winner::Enemy:
         ++getData().loseCount;
 
         if (getData().haveMoney == 0) {
@@ -210,13 +224,12 @@ void Game::CollectCard() {
             --getData().haveMoney;
             getData().betMoney = 1;
         }
-    }
-    else if (IsPlayerWin()) {
-        ++getData().winCount;
-        getData().haveMoney += getData().betMoney;
-    }
-    else {
+        break;
+    case Winner::Draw:
         ++getData().drawCount;
+        break;
+    default:
+        break;
     }
 
     // プレイヤーのカードがなくなるまで
@@ -345,15 +358,20 @@ void Game::draw() const {
     if (m_turn != Turn::Result) {
         return;
     }
-    
-    if (IsPlayerWin()) {
+
+    switch (m_winner) {
+    case Winner::Player:
         FontAsset(U"GameResult")(U"Win").drawAt(Scene::CenterF().moveBy(0, -55), Palette::Red);
-    }
-    else if (IsDrawGame()) {
-        FontAsset(U"GameResult")(U"Draw").drawAt(Scene::CenterF().moveBy(0, -55), Palette::Black);
-    }
-    else {
+        break;
+    case Winner::Enemy:
         FontAsset(U"GameResult")(U"Lose").drawAt(Scene::CenterF().moveBy(0, -55), Palette::Darkblue);
+        break;
+    case Winner::Draw:
+        FontAsset(U"GameResult")(U"Draw").drawAt(Scene::CenterF().moveBy(0, -55), Palette::Black);
+        break;
+    default:
+        break;
     }
+    
     FontAsset(U"KeyEnterDown")(U"クリックしてください").drawAt(Scene::CenterF().moveBy(0, 320), Palette::Black);
 }
